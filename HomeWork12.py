@@ -104,7 +104,7 @@ class AddressBook(UserDict):
     def unpack_file (self):       
         try:
             with open('addressbook.bin', 'rb') as fh:
-                address.data = pickle.load(fh)
+                self.data = pickle.load(fh)
         except FileNotFoundError:
             pass
 
@@ -122,8 +122,6 @@ class AddressBook(UserDict):
             if self.flag == 1:
                 self.dict.update({key:self.phone_list})
 
-address =  AddressBook()
-
 def input_error(func):
     def wrapper(*args, **kwargs):
         try:
@@ -137,66 +135,61 @@ def input_error(func):
     return wrapper
 
 @input_error
-def add(func_arg):
+def add(func_arg, address):
     record = Record(func_arg[0])
     record.add_phone(func_arg[1])
     address.add_record(record)
     return 'A new contact has been added'
 
 @input_error
-def add_phone(func_arg):
+def add_phone(func_arg, address):
     addphone = address.data[func_arg[0]]
     addphone.add_phone(func_arg[1])
     return 'A new phone has been added'     
 
 @input_error
-def add_birthday(func_arg):
+def add_birthday(func_arg, address):
     addbirthday = address.data[func_arg[0]]
     addbirthday.add_birthday(func_arg[1])
     return f'The birthday {func_arg[1]} has been added'
 
 @input_error
-def days_to_birthday(func_arg):
+def days_to_birthday(func_arg, address):
     birthday = address.data[func_arg[0]]
     return f'The days to birthday are: {birthday.days_to_birthday()}'
 
 @input_error
-def change(func_arg):
+def change(func_arg, address):
     change = address.data[func_arg[0]]
     change.change_phone(func_arg[1], func_arg[2])
     return f'The phone: {func_arg[1]} has been changes to {func_arg[2]}'
 
 @input_error
-def remove(func_arg):
+def remove(func_arg, address):
     remove = address.data[func_arg[0]]
     remove.remove_phone(func_arg[1])
     return f'The phone: {func_arg[1]} has been removed'
 
 @input_error
-def phone(func_arg):
+def phone(func_arg, address):
     address.show_record(func_arg[0])
     return f'The contact "{func_arg[0]}" has phones: {address.list}'
 
 @input_error
-def save_book():
+def save_book(address):
     address.save_book()
     return 'The Addressbook was saved in file "addressbook.bin". Good bye!'
 
 @input_error
-def open_file(func_arg):
-    address.unpack_file(func_arg[0])
-    return f'The file "{func_arg[0]}" has been unpacked'    
-
-@input_error
-def iterator(func_arg):
+def iterator(func_arg, address):
     return address.iterator(int(func_arg[0]))
 
 @input_error
-def hello():
+def hello(_=None):
     return 'How can I help you?'
 
 @input_error
-def find(func_arg):
+def find(func_arg, address):
     address.find(func_arg[0])
     if address.dict != {}:
         return f'The coincidences was found in this contacts: {address.dict}'
@@ -220,7 +213,8 @@ commands = {
 }
 
 def main():
-
+    
+    address =  AddressBook()
     address.unpack_file()
 
     while True:
@@ -229,10 +223,10 @@ def main():
         input_string = input().lower()
 
         if input_string.split()[0] in commands and len(input_string.split()) > 1:
-            print(commands[input_string.split()[0]](input_string.split()[1:]))
+            print(commands[input_string.split()[0]](input_string.split()[1:], address))
             
         elif input_string in commands:
-            print(commands[input_string]())
+            print(commands[input_string](address))
             if commands[input_string] == save_book:
                 break
 
