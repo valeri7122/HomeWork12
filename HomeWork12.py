@@ -191,7 +191,7 @@ def hello(_=None):
 @input_error
 def find(func_arg, address):
     address.find(func_arg[0])
-    if address.dict != {}:
+    if address.dict:
         return f'The coincidences was found in this contacts: {address.dict}'
     else:
         return 'The coincidences was not found.' 
@@ -229,6 +229,8 @@ def main():
             print(commands[input_string](address))
             if commands[input_string] == save_book:
                 break
+        with open('addressbook.bin', 'wb') as fh:
+            pickle.dump(address.data, fh)
 
 if __name__ == '__main__':
     main()
