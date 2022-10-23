@@ -1,6 +1,7 @@
 from collections import UserDict
 from datetime import datetime
 import pickle
+import os
 
 
 class Field:
@@ -98,14 +99,16 @@ class AddressBook(UserDict):
             return i 
 
     def save_book(self):
-        with open('addressbook.bin', 'wb') as fh:
+        if not os.path.exists('C://Addressbook'):
+            os.mkdir('C://Addressbook')
+        with open('C://Addressbook/addressbook.bin', 'wb') as fh:
             pickle.dump(self.data, fh)
 
     def unpack_file (self):       
         try:
-            with open('addressbook.bin', 'rb') as fh:
+            with open('C://Addressbook/addressbook.bin', 'rb') as fh:
                 self.data = pickle.load(fh)
-        except FileNotFoundError:
+        except Exception:
             pass
 
     def find(self, some_string):
@@ -185,7 +188,7 @@ def iterator(func_arg, address):
     return address.iterator(int(func_arg[0]))
 
 @input_error
-def hello(_=None):
+def hello(arg=None):
     return 'How can I help you?'
 
 @input_error
@@ -229,8 +232,7 @@ def main():
             print(commands[input_string](address))
             if commands[input_string] == save_book:
                 break
-        with open('addressbook.bin', 'wb') as fh:
-            pickle.dump(address.data, fh)
+
 
 if __name__ == '__main__':
     main()
